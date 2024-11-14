@@ -40,8 +40,8 @@ export default function DashboardPage() {
   }
 
   const gerarCodigo = async () => {
-    if (!selectedClient) return
-
+    if (!selectedClient) return;
+  
     const response = await fetch('/api/admin/gerar_codigo', {
       method: 'POST',
       headers: {
@@ -52,13 +52,27 @@ export default function DashboardPage() {
         id_maquina: selectedClient,
         dias_validade: diasValidade
       })
-    })
-
+    });
+  
     if (response.ok) {
-      const data = await response.json()
-      setCodigoGerado(data.codigo)
+      const data = await response.json();
+      setCodigoGerado(data.codigo);
+  
+      // Armazenar o código gerado em um arquivo JSON
+      await fetch('/api/admin/salvar_codigo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Key': localStorage.getItem('adminKey') || ''
+        },
+        body: JSON.stringify({
+          codigo: data.codigo,
+          id_maquina: selectedClient,
+          dias_validade: diasValidade
+        })
+      });
     }
-  }
+  };
 
   return (
     <div className="p-8">
